@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Influencer Profile Setup</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Complete Influencer Profile Setup</h1> <br><br>
+        <form method="POST" action="{{ url_for('influencer_setup') }}">
+            <div class="form-group">
+                <select name="category" class="form-control" required>
+                    <option value="">Select Category</option>
+                    <option value="nano_influencer">Nano Influencer (Less Than 1k Followers)</option>
+                    <option value="micro_influencer">Micro Influencer (1k - 100k Followers)</option>
+                    <option value="mid-tier_influencer">Mid-Tier Influencer (100k - 500k Followers)</option>
+                    <option value="macro_influencer">Macro Influencer (500k - 1M Followers)</option>
+                    <option value="mega_influencer">Mega Influencer (1M+ Followers)</option>
+                </select>
+            </div>
+            <br>
+            <div class="form-group">
+                <input type="text" id="niche" name="niche" placeholder="Niche" required class="form-control"><br>
+            </div>
+            <div class="form-group">
+                <input type="number" id="reach" name="reach" placeholder="Reach" required class="form-control"><br>
+            </div>
+            <button type="submit" class="btn btn-primary">Complete Setup</button>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search For Campaigns</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <style>
+        .roundedTable {
+            border-collapse: separate;
+            border-spacing: 10px 10px; 
+            width: 100%;
+            margin: 0;
+        }
+
+        .roundedTable th,
+        .roundedTable td {
+            padding: .6em;
+            background: #659dffaf;
+            border: none;
+            border-radius: .6em;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .roundedTable th {
+            text-align: center;
+        }
+
+        .roundedTable tr td + td {
+            margin-left: 10px; 
+        }
+
+        .roundedTable {
+            border: none;
+        }
+    </style>
+    <script>
+        function updatePlaceholder() {
+            var criteria = document.getElementById('searchCriteria').value;
+            var queryInput = document.getElementById('query');
+
+            if (criteria === 'by_name') {
+                queryInput.placeholder = 'Search by campaign name';
+            } else if (criteria === 'by_niche') {
+                queryInput.placeholder = 'Search by campaign niche';
+            }
+        }
+
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Search for Campaigns</h1><br><br>
+        <form method="POST" action="{{ url_for('search_campaigns') }}">
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <select id="searchCriteria" name="type" class="form-control" required onchange="updatePlaceholder()">
+                        <option value="">Select Criteria</option>
+                        <option value="by_name">By Name</option>
+                        <option value="by_niche">By Niche</option>
+                    </select>
+                </div>
+                <div class="col-md-9 mb-3">
+                    <input type="text" id="query" name="query" placeholder="Search" required class="form-control">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+        <div class="mt-5">
+            {% if searched %}
+                {% if result %}
+                    <h2>Results:</h2>
+                    <table class="table table-sm table-bordered roundedTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Campaign Name</th>
+                                <th>Company Name</th>
+                                <th>Budget</th>
+                                <th>Start Date</th>
+                                <th>End Date</th>
+                                <th>Campaign Niche</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for campaign in result %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ campaign['name'] }}</td>
+                                    <td>{{ campaign['company_name'] }}</td>
+                                    <td>{{ campaign['budget'] }}</td>
+                                    <td>{{ campaign['start_date'] }}</td>
+                                    <td>{{ campaign['end_date'] }}</td>
+                                    <td>{{ campaign['niche/industry'] }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <h3>No results found.</h3>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+
+    <div class="modal fade" id="acceptModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Accept Ad Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to accept this ad request from Campaign: <span id="acceptModalCampaignName"></span>?</p>
+                </div>
+                <div class="modal-footer">
+                    <form id="acceptForm" method="POST" action="{{ url_for('accept_adrequest') }}">
+                        <input type="hidden" name="accept_id" id="acceptCampaignId">
+                        <button type="submit" class="btn btn-primary">Accept</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="rejectModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Reject Ad Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <p>Are you sure you want to reject this ad request from Sponsor: <span id="rejectModalSponsorName"></span>?</p>
+                </div>
+                <div class="modal-footer">
+                    <form id="rejectForm" method="POST" action="{{ url_for('reject_adrequest') }}">
+                        <input type="hidden" name="reject_id" id="rejectAdRequestId">
+                        <button type="submit" class="btn btn-danger">Reject</button>
+                    </form>
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                    <button type="button" class="btn btn-info" onclick="showNegotiateModal()">Negotiate</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal fade" id="negotiateModal" tabindex="-1" role="dialog">
+        <div class="modal-dialog" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Negotiate Ad Request</h5>
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+                <div class="modal-body">
+                    <form id="negotiateForm" method="POST" action="{{ url_for('negotiate_adrequest') }}">
+                        <input type="hidden" name="negotiate_id" id="negotiateAdRequestId">
+                        <div class="form-group">
+                            <label for="negotiateMessage">Message:</label>
+                            <textarea id="negotiateMessage" name="message" class="form-control" rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Send</button>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

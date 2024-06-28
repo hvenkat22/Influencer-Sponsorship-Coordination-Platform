@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personal Statistics</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .container {
+            display: flex;
+            justify-content: space-around;
+            margin: 20px auto;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a href="{{url_for('home')}}" class="btn btn-primary">Back to Dashboard</a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <h1 class="text-center">Personal Statistics</h1><br>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="campaignBar" width="400" height="300"></canvas>
+            <h5 style="text-align: center;">Campaign Active/Inactive Counts</h5>
+        </div>
+        <div class="chart-container">
+            <canvas id="campaignPie" width="400" height="300"></canvas>
+            <h5 style="text-align: center;">Campaign Active/Inactive Distribution</h5>
+        </div>
+    </div>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="adRequestBar" width="400" height="300"></canvas>
+            <h5 style="text-align: center;">Ad Request Status Counts</h5>
+        </div>
+        <div class="chart-container">
+            <canvas id="adRequestPie" width="400" height="300"></canvas>
+            <h5 style="text-align: center;">Ad Request Status Distribution</h5>
+        </div>
+    </div>
+    <div class="container">
+        <div class="chart-container">
+            <canvas id="budgetUtilizationBar" width="400" height="300"></canvas>
+            <h5 style="text-align: center;">Campaign Budget Utilization </h5>
+        </div>
+        <div class="chart-container">
+            <canvas id="topInfluencersChart" width="400" height="300"></canvas>
+            <h5 style="text-align: center;">Top 5 Influencers by Reach/Followers</h5>
+        </div>
+    </div>
+
+    <script>
+        var ctxBar = document.getElementById('campaignBar').getContext('2d');
+        var myBarChart = new Chart(ctxBar, {
+            type: 'bar',
+            data: {
+                labels: ['Active','Inactive'],
+                datasets: [{
+                    label: 'Counts',
+                    data: [{{active}},{{inactive}}],
+                    backgroundColor: 'rgba(192, 35, 100, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,  
+                            callback: function(value) {
+                                if (Number.isInteger(value)) {
+                                    return value;
+                                }
+                            }
+                        }       
+                    }
+                }
+            }
+        });
+
+        var ctxPie = document.getElementById('campaignPie').getContext('2d');
+        var myPieChart = new Chart(ctxPie, {
+            type: 'pie',
+            data: {
+                labels: ['Active','Inactive'],
+                datasets: [{
+                    label: 'Distribution',
+                    data: [{{active}},{{inactive}}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                var dataset = tooltipItem.dataset;
+                                var total = dataset.data.reduce((acc, val) => acc + val, 0);
+                                var currentValue = dataset.data[tooltipItem.dataIndex];
+                                var percentage = ((currentValue / total) * 100).toFixed(2);
+                                return percentage + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+        var adBar = document.getElementById('adRequestBar').getContext('2d')
+        var adBarChart = new Chart(adBar, {
+            type: 'bar',
+            data: {
+                labels:['Accepted','Rejected','Negotiating','Pending','Paid'],
+                datasets: [{
+                    label: 'Counts',
+                    data: [{{ accepted }}, {{ rejected }}, {{ negotiating }}, {{ pending }}, {{ paid }}],
+                    backgroundColor: 'rgba(192, 35, 100, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1,  
+                            callback: function(value) {
+                                if (Number.isInteger(value)) {
+                                    return value;
+                                }
+                            }
+                        }       
+                    }
+                }
+            }
+        });
+        var adPie = document.getElementById('adRequestPie').getContext('2d')
+        var adPieChart = new Chart(adPie, {
+            type: 'pie',
+            data: {
+                labels:['Accepted','Rejected','Negotiating','Pending','Paid'],
+                datasets: [{
+                    label: 'Distribution',
+                    data: [{{ accepted }}, {{ rejected }}, {{ negotiating }}, {{ pending }}, {{ paid }}],
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.2)',
+                        'rgba(54, 162, 235, 0.2)',
+                        'rgba(255, 206, 86, 0.2)',
+                        'rgba(75, 192, 192, 0.2)',
+                        'rgba(153, 102, 255, 0.2)'
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 206, 86, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(tooltipItem) {
+                                var dataset = tooltipItem.dataset;
+                                var total = dataset.data.reduce((acc, val) => acc + val, 0);
+                                var currentValue = dataset.data[tooltipItem.dataIndex];
+                                var percentage = ((currentValue / total) * 100).toFixed(2);
+                                return percentage + '%';
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var topInfluencersBar = document.getElementById('topInfluencersChart').getContext('2d')
+        var topInfluencersBarChart = new Chart(topInfluencersBar, {
+            type: 'bar',
+            data: {
+                labels:{{ influencer_names|tojson }},
+                datasets: [{
+                    label: 'Reach',
+                    data: {{ influencer_reachs|tojson }},
+                    backgroundColor: 'rgba(192, 35, 100, 1)',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                indexAxis: 'y',
+                scales: {
+                    x: {
+                        type: 'logarithmic', 
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return Number(value.toString()); 
+                            }
+                        }
+                    }
+                }
+            }
+        });
+
+        var ctx = document.getElementById('budgetUtilizationBar').getContext('2d');
+        var budgetUtilizationChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: {{ campaign_names|safe }},
+                datasets: [
+                    {
+                        label: 'Allocated Budget',
+                        data: {{ allocated_budgets|safe }},
+                        backgroundColor: 'rgba(54, 162, 235, 1)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    },
+                    {
+                        label: 'Spent Budget',
+                        data: {{ spent_budgets|safe }},
+                        backgroundColor: 'rgba(192, 35, 100, 1)',
+                        borderColor: 'rgba(192, 35, 100, 1)',
+                        borderWidth: 1
+                    }
+                ]
+            },
+            options: {
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            stepSize: 1000 
+                        }
+                    }
+                }
+            }
+        });
+ 
+
+    </script>
+</body>
+</html>

@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flagged Users/Campaigns</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<style>
+    .navbar {
+            background-color: #000080;
+    }
+    .roundedTable {
+            border-collapse: separate;
+            border-spacing: 10px 10px; 
+            width: 100%;
+            margin: 0;
+    }
+
+    .roundedTable th,
+    .roundedTable td {
+        padding: .6em;
+        background: #659dffaf;
+        border: none;
+        border-radius: .6em;
+        box-shadow: 0 0 5px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+
+    .roundedTable th {
+        text-align: center;
+    }
+
+    .roundedTable tr td + td {
+        margin-left: 10px; 
+    }
+
+    .roundedTable {
+        border: none;
+    }
+</style>
+<script>
+    function showFlaggedSponsorsTable(){
+        document.getElementById("flaggedSponsorsTable").style.display = 'block';
+        document.getElementById("flaggedSponsorsCard").style.display = 'none';
+    }
+    function showFlaggedSponsorsCard(){
+        document.getElementById("flaggedSponsorsTable").style.display = 'none';
+        document.getElementById("flaggedSponsorsCard").style.display = 'block';
+    }
+    function showFlaggedInfluencersTable(){
+        document.getElementById("flaggedInfluencersTable").style.display = 'block';
+        document.getElementById("flaggedInfluencersCard").style.display = 'none';
+    }
+    function showFlaggedInfluencersCard(){
+        document.getElementById("flaggedInfluencersTable").style.display = 'none';
+        document.getElementById("flaggedInfluencersCard").style.display = 'block';
+    }
+    function showFlaggedCampaignsTable(){
+        document.getElementById("flaggedCampaignsTable").style.display = 'block';
+        document.getElementById("flaggedCampaignsCard").style.display = 'none';
+    }
+    function showFlaggedCampaignsCard(){
+        document.getElementById("flaggedCampaignsTable").style.display = 'none';
+        document.getElementById("flaggedCampaignsCard").style.display = 'block';
+    }
+</script>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a href="{{url_for('home')}}" class="btn btn-primary">Back to Dashboard</a>
+                </li>
+                <li class="nav-item">
+                    <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                    </p>
+                </li>
+                <li class="nav-item">
+                    <button class="btn btn-primary" onclick="showFlaggedInfluencersTable(); showFlaggedSponsorsTable(); showFlaggedCampaignsTable();">Table View</button>
+                    <button class="btn btn-info" onclick="showFlaggedSponsorsCard(); showFlaggedInfluencersCard(); showFlaggedCampaignsCard();">Card View</button>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <h1 class="text-center">Flagged Users and Campaigns</h1>
+        <br>
+        <div id="flaggedSponsorsTable">
+            <h3>Flagged Sponsors:</h3>
+            <table class="table table-sm table-bordered roundedTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Sponsor Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th> 
+                        <th>Company Name</th> 
+                        <th>Industry</th>
+                        <th>Budget</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for element in flagged_sponsors %}
+                        <tr>
+                            <td>{{loop.index}}</td>
+                            <td>{{element['username']}}</td>
+                            <td>{{element['sponsor_name']}}</td>
+                            <td>{{element['email']}}</td>
+                            <td>{{element['phone_number']}}</td>
+                            <td>{{element['company_name']}}</td>
+                            <td>{{element['industry']}}</td>
+                            <td>{{element['budget']}}</td>
+                            <td>
+                                {% if element['flagged_messages'] %}
+                                    <h7><strong>{{element['flagged_messages']}}</strong></h7>
+                                    <br>
+                                    <a href="{{url_for('unflag_user',user_id=element['id'])}}" class="btn btn-primary text-white">Unflag</a>
+                                {% else %}
+                                    <h7><strong>Waiting for Response...</strong></h7>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div id="flaggedInfluencersTable">
+            <h3>Flagged Influencers:</h3>
+            <table class="table table-sm table-bordered roundedTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Username</th>
+                        <th>Influencer Name</th>
+                        <th>Email</th>
+                        <th>Phone Number</th> 
+                        <th>Category</th> 
+                        <th>Niche</th>
+                        <th>Reach</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for element in flagged_influencers %}
+                        <tr>
+                            <td>{{loop.index}}</td>
+                            <td>{{element['username']}}</td>
+                            <td>{{element['influencer_name']}}</td>
+                            <td>{{element['email']}}</td>
+                            <td>{{element['phone_number']}}</td>
+                            <td>{{element['category']}}</td>
+                            <td>{{element['niche']}}</td>
+                            <td>{{element['reach']}}</td>
+                            <td>
+                                {% if element['flagged_messages'] %}
+                                    <h7><strong>{{element['flagged_messages']}}</strong></h7>
+                                    <br>
+                                    <a href="{{url_for('unflag_user',user_id=element['id'])}}" class="btn btn-primary text-white">Unflag</a>
+                                {% else %}
+                                    <h7><strong>Waiting for Response...</strong></h7>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <br>
+        <div id="flaggedCampaignsTable">
+            <h3>Flagged Campaigns:</h3>
+            <table class="table table-sm table-bordered roundedTable">
+                <thead>
+                    <tr>
+                        <th>No</th>
+                        <th>Sponsor Name</th>
+                        <th>Campaign Name</th>
+                        <th>Description</th>
+                        <th>Start Date</th>
+                        <th>End Date</th>
+                        <th>Budget</th>
+                        <th>Visibility</th>
+                        <th>Goals</th>
+                        <th>Response</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for element in flagged_campaigns %}
+                        <tr>
+                            <td>{{ loop.index }}</td>
+                            <td>{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}</td>
+                            <td>{{ element['name'] }}</td>
+                            <td>{{ element['description'] }}</td>
+                            <td>{{ element['start_date'] }}</td>
+                            <td>{{ element['end_date'] }}</td>
+                            <td>{{ element['budget'] }}0</td>
+                            <td>{{ element['visibility'] }}</td>
+                            <td>{{ element['goals'] }}</td>
+                            <td>
+                                {% if element['flagged_messages'] %}
+                                    <h7><strong>{{element['flagged_messages']}}</strong></h7>
+                                    <br>
+                                    <a href="{{url_for('unflag_campaign',campaign_id=element['id'])}}" class="btn btn-primary text-white">Unflag</a>
+                                {% else %}
+                                    <h7><strong>Waiting for Response...</strong></h7>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    {% endfor %}
+            </tbody>
+        </table>
+        </div>
+        <div id="flaggedSponsorsCard" style="display: none;">
+            <h3>Flagged Sponsors:</h3>
+            <div class="row">
+            {% for element in flagged_sponsors %}
+                    <div class="card m-2 text-white bg-info mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{ element['sponsor_name'] }}</h5>
+                            <p class="card-text">{{ element['username'] }}</p>
+                            <p class="card-text">Email: {{element['email']}}</p>
+                            <p class="card-text">Phone Number: {{element['phone_number']}}</p>
+                            <p class="card-text">Company Name: {{element['company_name']}}</p>
+                            <p class="card-text">Industry: {{element['industry']}}</p>
+                            <p class="card-text">Budget: {{element['budget']}}</p>
+                            {% if element['flagged_messages'] %}
+                                <h7 class="card-info text-dark"><strong>Response: {{element['flagged_messages']}}</strong></h7>
+                                <br>
+                                <a href="{{url_for('unflag_user',user_id=element['id'])}}" class="btn btn-primary text-white">Unflag</a>
+                            {% else %}
+                                <h5 class="card-info text-dark">Waiting for Response...</h5>
+                            {% endif %}
+                        </div>
+                    </div>
+            {% endfor %}
+        </div>
+        <br>
+        <div id="flaggedInfluencersCard" style="display: none;">
+            <h3>Flagged Influencers:</h3>
+            <div class="row">
+            {% for element in flagged_influencers %}
+                    <div class="card m-2 text-white bg-info mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{ element['influencer_name'] }}</h5>
+                            <p class="card-text">{{ element['username'] }}</p>
+                            <p class="card-text">Email: {{element['email']}}</p>
+                            <p class="card-text">Phone Number: {{element['phone_number']}}</p>
+                            <p class="card-text">Category: {{element['category']}}</p>
+                            <p class="card-text">Niche: {{element['niche']}}</p>
+                            <p class="card-text">Reach: {{element['reach']}}</p>
+                            {% if element['flagged_messages'] %}
+                                <h7 class="card-info text-dark"><strong>Response: {{element['flagged_messages']}}</strong></h7>
+                                <br>
+                                <a href="{{url_for('unflag_user',user_id=element['id'])}}" class="btn btn-primary text-white">Unflag</a>
+                            {% else %}
+                                <h5 class="card-info text-dark">Waiting for Response...</h5>
+                            {% endif %}
+                        </div>
+                    </div>
+            {% endfor %}
+        </div>
+        <br>
+        <div id="flaggedCampaignsCard" style="display: none;">
+            <h3>Flagged Campaigns:</h3>
+            <div class="row">
+            {% for element in flagged_campaigns %}
+                    <div class="card m-2 text-white bg-info mb-3">
+                        <div class="card-body">
+                            <h5 class="card-title text-dark">{{ element['name'] }}</h5>
+                            <p class="card-text">{{ element['sponsor_first_name'] }} {{ element['sponsor_last_name'] }}</p>
+                            <p class="card-text">{{element['description']}}</p>
+                            <p class="card-text">Duration: {{element['start_date']}} - {{element['end_date']}}</p>
+                            <p class="card-text">Budget: {{element['budget']}}</p>
+                            <p class="card-text">Visibility: {{element['visibility']}}</p>
+                            <p class="card-text">Goals: {{element['goals']}}</p>
+                            {% if element['flagged_messages'] %}
+                                <h7><strong>{{element['flagged_messages']}}</strong></h7>
+                                <br>
+                                <a href="{{url_for('unflag_campaign',campaign_id=element['id'])}}" class="btn btn-primary text-white">Unflag</a>
+                            {% else %}
+                                <h7><strong>Waiting for Response...</strong></h7>
+                            {% endif %}
+                        </div>
+                    </div>
+            {% endfor %}
+        </div>
+    </div>
+</body>
+</html>

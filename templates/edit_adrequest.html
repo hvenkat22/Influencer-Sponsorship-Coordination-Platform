@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit Ad Request</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="text-center">Edit Ad Request</h1>
+        <form method="POST" action="{{ url_for('edit_adrequest', id = adrequest.id) }}">
+            <div class="form-group">
+                <label for="messages">Messages</label>
+                <textarea type="text" class="form-control" id="messages" name="messages" required>{{adrequest.messages}}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="requirements">Requirements</label>
+                <textarea class="form-control" id="requirements" name="requirements" required>{{adrequest.requirements}}</textarea>
+            </div>
+            <div class="form-group">
+                <label for="payment_amount">Payment Amount</label>
+                <input type="number" class="form-control" id="payment_amount" name="payment_amount" value="{{adrequest.payment_amount}}0" required>
+            </div>
+            <input type="hidden" name="adrequest_id" value="{{ request.args.get('adrequest_id') }}">
+            <button type="submit" class="btn btn-primary">Edit Ad Request</button>
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

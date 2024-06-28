@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Update Influencer Profile</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Update Influencer Profile</h1> <br><br>
+        <form method="POST" action="{{ url_for('profile_edit') }}">
+            <div class="form-group">
+                <input type="text" id="niche" name="niche" placeholder="Niche" required class="form-control"><br>
+            </div>
+            <div class="form-group">
+                <input type="number" id="reach" name="reach" placeholder="Reach" required class="form-control"><br>
+            </div>
+            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search For Influencers</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <style>
+        .roundedTable {
+            border-collapse: separate;
+            border-spacing: 10px 10px; 
+            width: 100%;
+            margin: 0;
+        }
+
+        .roundedTable th,
+        .roundedTable td {
+            padding: .6em;
+            background: #659dffaf;
+            border: none;
+            border-radius: .6em;
+            box-shadow: 0 0 5px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+
+        .roundedTable th {
+            text-align: center;
+        }
+
+        .roundedTable tr td + td {
+            margin-left: 10px; 
+        }
+
+        .roundedTable {
+            border: none;
+        }
+    </style>
+    <script>
+        function updatePlaceholder() {
+            var criteria = document.getElementById('searchCriteria').value;
+            var queryInput = document.getElementById('query');
+            var categorySelect = document.getElementById('categorySelect');
+
+            if (criteria === 'by_user') {
+                queryInput.placeholder = 'Search by username starting';
+                queryInput.style.display = 'block';
+                categorySelect.style.display = 'none';
+                queryInput.required = true;
+                categorySelect.required = false;
+            } else if (criteria === 'by_niche') {
+                queryInput.placeholder = 'Search by niche';
+                queryInput.style.display = 'block';
+                categorySelect.style.display = 'none';
+                queryInput.required = true;
+                categorySelect.required = false;
+            } else if (criteria === 'by_category') {
+                queryInput.style.display = 'none';
+                categorySelect.style.display = 'block';
+                queryInput.required = false;
+                categorySelect.required = true;
+            } else {
+                queryInput.placeholder = 'Search';
+                queryInput.style.display = 'block';
+                categorySelect.style.display = 'none';
+                queryInput.required = true;
+                categorySelect.required = false;
+            }
+        }
+    </script>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Search for Influencers</h1><br><br>
+        <form method="POST" action="{{ url_for('search_influencers') }}">
+            <div class="form-row">
+                <div class="col-md-3 mb-3">
+                    <select id="searchCriteria" name="type" class="form-control" required onchange="updatePlaceholder()">
+                        <option value="">Select Criteria</option>
+                        <option value="by_user">Username Starts With</option>
+                        <option value="by_niche">By Niche</option>
+                        <option value="by_category">By Category</option>
+                    </select>
+                </div>
+                <div class="col-md-9 mb-3">
+                    <input type="text" id="query" name="query" placeholder="Search" required class="form-control">
+                    <select id="categorySelect" name="category" class="form-control" style="display:none;">
+                        <option value="">Select Category</option>
+                        <option value="nano_influencer">Nano Influencer (Less Than 1k Followers)</option>
+                        <option value="micro_influencer">Micro Influencer (1k - 100k Followers)</option>
+                        <option value="mid-tier_influencer">Mid-Tier Influencer (100k - 500k Followers)</option>
+                        <option value="macro_influencer">Macro Influencer (500k - 1M Followers)</option>
+                        <option value="mega_influencer">Mega Influencer (1M+ Followers)</option>
+                    </select>
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Search</button>
+            <a href="{{ url_for('home') }}" class="btn btn-secondary">Cancel</a>
+        </form>
+        <div class="mt-5">
+            {% if searched %}
+                {% if result %}
+                    <h2>Results:</h2>
+                    <table class="table table-sm table-bordered roundedTable">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Influencer Name</th>
+                                <th>Username</th>
+                                <th>Niche</th>
+                                <th>Category</th>  
+                                <th>Reach</th>
+                                <th>Phone Number</th>
+                                <th>Email</th>
+                                <th>Select Campaign and Send Ad Request</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for influencer in result %}
+                                <tr>
+                                    <td>{{ loop.index }}</td>
+                                    <td>{{ influencer[1] }} {{ influencer[2] }}</td>
+                                    <td>{{ influencer[3] }}</td>
+                                    <td>{{ influencer[4] }}</td>
+                                    <td>{{ influencer[5] }}</td>
+                                    <td>{{ influencer[6] }}</td>
+                                    <td>{{ influencer[7] }}</td>
+                                    <td>{{ influencer[8] }}</td>
+                                    <td colspan="2">
+                                        <form method="GET" action="{{ url_for('send_adrequest') }}">
+                                            <input type="hidden" name="influencer_id" value="{{ influencer[0] }}">
+                                            <select name="campaign_id" class="form-control d-inline-block w-auto" required>
+                                                <option value="">Select Campaign</option>
+                                                {% for campaign in campaigns %}
+                                                        <option value="{{ campaign.id }}">{{ campaign.name }}</option>
+                                                {% endfor %}
+                                            </select>
+                                            <button type="submit" class="btn btn-primary d-inline-block">Send Ad Request</button>
+                                        </form>
+                                        
+                                    </td>                                    
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                {% else %}
+                    <h3>No results found.</h3>
+                {% endif %}
+            {% endif %}
+        </div>
+    </div>
+</body>
+</html>

@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Validation</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+</head>
+<body>
+    <div class="container mt-5">
+        <h1>Admin Validation</h1> <br><br>
+        {% with messages = get_flashed_messages() %}
+                  {% if messages %}
+                    <div class="alert alert-warning" role="alert">
+                      {{ messages[0] }}
+                    </div>
+                  {% endif %}
+        {% endwith %}
+        <form method="POST" action="{{ url_for('admin_validation') }}">
+            <div class="form-group">
+                <input type="text" id="admin_key" name="admin_key" placeholder="Enter Admin Key" required class="form-control"><br>
+            </div>
+            <button type="submit" class="btn btn-primary">Validate</button>
+        </form>
+    </div>
+</body>
+</html>
