@@ -1,3 +1,6 @@
+#Created by: Hari Venkataraman (hvenkat22)
+#Influencer Sponsorship Coordination Platform using Flask-sqlalchemy, Jinja2, HTML, JS, and Bootstrap CSS
+
 from flask_sqlalchemy import SQLAlchemy
 from datetime import datetime
 

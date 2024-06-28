@@ -1,3 +1,6 @@
+#Created by: Hari Venkataraman (hvenkat22)
+#Influencer Sponsorship Coordination Platform using Flask-sqlalchemy, Jinja2, HTML, JS, and Bootstrap CSS
+
 import random
 from sqlalchemy import func, desc
 from flask import Flask, render_template, request, redirect, url_for, flash, session
