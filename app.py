@@ -9,8 +9,8 @@ from models import User, Sponsor, Influencer, Campaign, AdRequest, db
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///InfluencerHub.db'
-app.config['SECRET_KEY'] = 'X348AGHR8IQ2'
-admin_key = '5T2E3#R%$!'
+app.config['SECRET_KEY'] = '-----------'
+admin_key = '------------'
 flag=False
 paid=False
 db.init_app(app)
