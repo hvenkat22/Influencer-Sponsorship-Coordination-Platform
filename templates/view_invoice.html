@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Invoice</title>
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
+    <style>
+        .invoice-card {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+        }
+        .invoice-header {
+            border-bottom: 2px solid #dee2e6;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        .invoice-header h2 {
+            font-weight: bold;
+        }
+        .invoice-details {
+            margin-bottom: 20px;
+        }
+        .invoice-footer {
+            border-top: 2px solid #dee2e6;
+            padding-top: 10px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light">
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav mr-auto">
+                <li class="nav-item">
+                    <a href="{{ url_for('view_payments') }}" class="btn btn-primary"><i class="fa fa-long-arrow-left"></i></a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    <div class="container mt-5">
+        <div class="invoice-card">
+            <div class="invoice-header text-center">
+                <h2>Payment #{{ invoice['payment_id'] }}</h2>
+                <h2>Invoice #{{invoice['id']}}</h2>
+                <p>Date: {{ invoice['invoice_date'] }}</p>
+            </div>
+            <div class="invoice-details">
+                <p><strong>Influencer Name and ID:</strong> {{invoice['influencer_id']}}, {{ invoice['influencer_name'] }}</p>
+                <p><strong>Sponsor Name and ID:</strong> {{invoice['sponsor_id']}}, {{ invoice['sponsor_name'] }}</p>
+                <p><strong>Ad Request ID:</strong> {{ invoice['adrequest_id'] }}</p>
+                <p><strong>Invoice Amount:</strong> {{ invoice['invoice_amount'] }}0</p>
+                <p><strong>Paid For:</strong> {{ invoice['expenses'] }}</p>
+            </div>
+            <div class="invoice-footer text-center">
+                <p>Thank you for your business!</p>
+                <p class="text-muted">For any queries, please contact support.</p>
+                <p class="text-muted">+91 8148473998</p>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

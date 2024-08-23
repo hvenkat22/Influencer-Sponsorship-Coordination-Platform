@@ -1,16 +1,14 @@
-#Created by: Hari Venkataraman (hvenkat22)
-#Influencer Sponsorship Coordination Platform using Flask-sqlalchemy, Jinja2, HTML, JS, and Bootstrap CSS
 
-import random
+import uuid
 from sqlalchemy import func, desc
-from flask import Flask, render_template, request, redirect, url_for, flash, session
+from flask import jsonify, Flask, render_template, request, redirect, url_for, flash, session
 from datetime import datetime
-from models import User, Sponsor, Influencer, Campaign, AdRequest, db
+from models import User, Sponsor, Influencer, Campaign, AdRequest, db, Payment, Feedback, Message, Notification, Invoice, Dispute, FAQ
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///InfluencerHub.db'
-app.config['SECRET_KEY'] = '-----------'
-admin_key = '------------'
+app.config['SECRET_KEY'] = 'X348AGHR8IQ2'
+admin_key = '5T2E3#R%$!'
 flag=False
 paid=False
 db.init_app(app)
@@ -352,6 +350,7 @@ def influencer_setup():
 
 @app.route('/create_campaign', methods=['GET', 'POST'])
 def create_campaign():
+    admin = User.query.filter_by(role='admin').first().id
     if request.method == 'POST':
         name = request.form['name']
         description = request.form['description']
@@ -374,6 +373,7 @@ def create_campaign():
             return redirect(url_for('home'))
         
         user = User.query.filter_by(username=username).first()
+        sponsor_name = str(user.first_name) + ' ' + str(user.last_name)
         sponsor = Sponsor.query.filter_by(user_id = user.id).first()
         if sponsor is None or user.role!= 'sponsor':
             flash('Invalid user or user is not a sponsor.')
@@ -395,6 +395,7 @@ def create_campaign():
             db.session.add(new_campaign)
             db.session.commit()
             flash('Campaign created successfully!')
+            create_notification(admin,f"A Campaign by the name of {name} was created by Sponsor: {sponsor_name}")
             return redirect(url_for('home'))
         except Exception as e:
             print(f'Error creating campaign: {e}')
@@ -488,6 +489,9 @@ def edit_campaign(id):
 def delete_campaign(campaign_id):
     campaign = db.session.query(Campaign).filter_by(id=campaign_id).first()
     adrequests = db.session.query(AdRequest).filter_by(campaign_id=campaign_id).all()
+    user = Sponsor.query.filter_by(id=campaign.sponsor_id).first().user_id
+    sponsor_name = str(User.query.filter_by(id=user).first().first_name) + ' ' + str(User.query.filter_by(id=user).first().last_name)
+    admin = User.query.filter_by(role='admin').first().id
     if campaign:
         for adrequest in adrequests:
             db.session.delete(adrequest)
@@ -495,6 +499,7 @@ def delete_campaign(campaign_id):
         db.session.delete(campaign)
         db.session.commit()
         flash(f'Campaign "{campaign.name}" has been deleted.', 'success')
+        create_notification(admin, f"The Campaign by the name of {campaign.name} created by Sponsor: {sponsor_name} was deleted along with all the Ad Requests associated with it.")
     else:
         flash('Campaign not found.', 'danger')
     
@@ -503,9 +508,18 @@ def delete_campaign(campaign_id):
 @app.route('/delete_adrequest/<int:adrequest_id>', methods=['POST'])
 def delete_adrequest(adrequest_id):
     adrequest = db.session.query(AdRequest).filter_by(id=adrequest_id).first()
+    campaign_name = Campaign.query.filter_by(id=adrequest.campaign_id).first().name
+    admin = User.query.filter_by(role='admin').first().id
+    sponsor_user = Sponsor.query.filter_by(id=adrequest.sponsor_id).first().user_id
+    user = User.query.filter_by(id=sponsor_user).first()
+    sponsor_name = str(user.first_name) + ' ' + str(user.last_name)
+    influencer_user = Influencer.query.filter_by(id=adrequest.influencer_id).first()
+    influencer_name = str(influencer_user.first_name) + ' ' + str(influencer_user.last_name)
     if adrequest:
         db.session.delete(adrequest)
         db.session.commit()
+        create_notification(influencer_user.user_id, f"Adrequest sent to you by {sponsor_name} for Campaign: {campaign_name} was deleted.")
+        create_notification(admin, f"Adrequest sent to {influencer_name} by {sponsor_name} for Campaign: {campaign_name} was deleted.")
     else:
         flash('AdRequest not found.', 'danger')
     
@@ -593,12 +607,18 @@ def send_adrequest():
 
     if request.method == 'POST':
         influencer_id = request.form['influencer_id']
+        admin = User.query.filter_by(role='admin').first().id
         campaign_id = request.form['campaign_id']
+        campaign_name = Campaign.query.filter_by(id=campaign_id).first().name
         messages = request.form['messages']
         requirements = request.form['requirements']
         payment_amount = request.form['payment_amount']
         username = session.get('user')
+        influencer=Influencer.query.filter_by(id=influencer_id).first().user_id
+        user_inf = User.query.filter_by(id=influencer).first()
+        inf_name = str(user_inf.first_name) + ' ' + str(user_inf.last_name)
         user = User.query.filter_by(username=username).first()
+        sponsor_name = str(user.first_name) + ' ' + str(user.last_name)
         sponsor_id = Sponsor.query.filter_by(user_id=user.id).first().id
 
         ad_request = AdRequest(
@@ -614,7 +634,9 @@ def send_adrequest():
         )
         db.session.add(ad_request)
         db.session.commit()
-        flash('Ad Request sent successfully!')
+        create_notification(user.id, f"Ad Request was sent successfuly to Influencer: {inf_name}")
+        create_notification(influencer, f"New Ad Request received from Sponsor: {sponsor_name} for Campaign: {campaign_name}")
+        create_notification(admin, f"An Ad Request sent from {sponsor_name} to {inf_name} for Campaign: {campaign_name}")
         return redirect(url_for('home'))
 
     return render_template('send_adrequest.html', influencer=influencer, influencer_info=influencer_info)
@@ -623,9 +645,13 @@ def send_adrequest():
 def accept_adrequest():
     adrequest_id = request.form.get('adrequest_id')
     adrequest = AdRequest.query.get(adrequest_id)
+    influencer = Influencer.query.filter_by(id=adrequest.influencer_id).first().user_id
+    name = str(db.session.query(User.first_name, User.last_name).filter_by(id=influencer).first()[0]) + ' ' + str(db.session.query(User.first_name, User.last_name).filter_by(id=influencer).first()[1])
+    user_sponsor = Sponsor.query.filter_by(id=adrequest.sponsor_id).first().user_id
     if adrequest:
         adrequest.status = 'accepted'
         db.session.commit()
+        create_notification(user_sponsor, f"{name} has accepted your Ad Request!")
         return redirect(url_for('home'))
     return redirect(url_for('home'))
 
@@ -633,9 +659,14 @@ def accept_adrequest():
 def reject_adrequest():
     adrequest_id = request.form.get('adrequest_id')
     adrequest = AdRequest.query.get(adrequest_id)
+    influencer = Influencer.query.filter_by(id=adrequest.influencer_id).first().user_id
+    name = str(db.session.query(User.first_name, User.last_name).filter_by(id=influencer).first()[0]) + ' ' + str(db.session.query(User.first_name, User.last_name).filter_by(id=influencer).first()[1])
+    user_sponsor = Sponsor.query.filter_by(id=adrequest.sponsor_id).first().user_id
     if adrequest:
         adrequest.status = 'rejected'
         db.session.commit()
+        create_notification(user_sponsor, f"{name} has rejected your Ad Request.")
+        return redirect(url_for('home'))
     return redirect(url_for('home'))
 
 @app.route('/negotiate_adrequest', methods=['POST'])
@@ -643,10 +674,14 @@ def negotiate_adrequest():
     adrequest_id = request.form.get('adrequest_id')
     new_payment_amount = request.form.get('new_payment_amount')
     adrequest = AdRequest.query.filter_by(id=adrequest_id).first()
+    user_sponsor = Sponsor.query.filter_by(id=adrequest.sponsor_id).first().user_id
+    influencer = Influencer.query.filter_by(id=adrequest.influencer_id).first().user_id
+    name = str(db.session.query(User.first_name, User.last_name).filter_by(id=influencer).first()[0]) + ' ' + str(db.session.query(User.first_name, User.last_name).filter_by(id=influencer).first()[1])
     if adrequest:
         adrequest.status = 'negotiating'
         adrequest.temp=new_payment_amount
         db.session.commit()
+        create_notification(user_sponsor, f"{name} wants to change the payment amount to: {new_payment_amount}")
         return redirect(url_for('home'))
 
 
@@ -658,8 +693,25 @@ def payment_page(adrequest_id):
 
 @app.route('/payment_completion/<int:adrequest_id>', methods=['GET', 'POST'])
 def payment_completion(adrequest_id):
-    idpay = random.randint(1, 10000000)
-    update_ad_request_status(adrequest_id)
+    idpay = uuid.uuid4()
+    admin = User.query.filter_by(role='admin').first().id
+    sponsor = db.session.query(Sponsor).join(AdRequest).filter(AdRequest.sponsor_id == Sponsor.id).filter(AdRequest.id == adrequest_id).first()
+    influencer = db.session.query(Influencer).join(AdRequest).filter(AdRequest.influencer_id == Influencer.id).filter(AdRequest.id == adrequest_id).first()
+    sponsor_name = str(db.session.query(User.first_name, User.last_name).filter(User.id == sponsor.user_id).first()[0]) + ' ' + str(db.session.query(User.first_name, User.last_name).filter(User.id == sponsor.user_id).first()[1])
+    influencer_name = str(db.session.query(User.first_name, User.last_name).filter(User.id == influencer.user_id).first()[0]) + ' ' + str(db.session.query(User.first_name, User.last_name).filter(User.id == influencer.user_id).first()[1])
+    payment_amount = db.session.query(AdRequest.payment_amount).filter(AdRequest.id == adrequest_id).first()[0]
+    new_payment = Payment(id=idpay, sponsor_id=sponsor.id, influencer_id=influencer.id, adrequest_id=adrequest_id, payment_date=datetime.today().date(), payment_amount=payment_amount)
+    new_invoice = Invoice(payment_id=idpay, influencer_id=influencer.id,adrequest_id=adrequest_id,invoice_date=datetime.today().date(),invoice_amount=payment_amount, sponsor_id=sponsor.id)
+    try:
+        db.session.add(new_payment)
+        db.session.add(new_invoice)
+        update_ad_request_status(adrequest_id)
+        db.session.commit()
+        create_notification(sponsor.user_id, f"Payment to {influencer_name} was complete! Your Payment ID is: {idpay}")
+        create_notification(influencer.user_id, f"Payment from {sponsor_name} was received! Your Payment ID is: {idpay}")
+        create_notification(admin, f"Payment complete from Sponsor: {sponsor_name} to Influencer: {influencer_name} with Payment ID: {idpay}")
+    except:
+        return '<h1>Error in Payment Processing</h1>'
     return render_template('payment_completion.html', payment_id=idpay)
 
 def update_ad_request_status(ad_request_id):
@@ -850,24 +902,8 @@ def all_stats():
         influencer_reachs.append(element.reach)
 
     
-    top_sponsors = db.session.query(
-    User.first_name,
-    User.last_name,
-    func.count(AdRequest.id).label('paid_ad_requests')
-    ).select_from(
-    User
-    ).join(
-    Sponsor
-    ).join(
-    AdRequest
-    ).filter(
-    AdRequest.status == 'paid'
-    ).group_by(
-    User.first_name,
-    User.last_name
-    ).order_by(
-    func.count(AdRequest.id).desc()
-    ).limit(5).all()
+    top_sponsors = db.session.query(User.first_name,User.last_name,func.count(AdRequest.id).label('paid_ad_requests')
+    ).select_from(User).join(Sponsor).join(AdRequest).filter(AdRequest.status == 'paid').group_by(User.first_name,User.last_name).order_by(func.count(AdRequest.id).desc()).limit(5).all()
     
     sponsor_names=[]
     ads_num=[]
@@ -934,8 +970,10 @@ def flag_user():
 def flag_campaign():
     campaign_id = request.args.get('campaign_id')
     campaign = Campaign.query.filter_by(id=campaign_id).first()
+    user = Sponsor.query.filter_by(id=campaign.sponsor_id).first().user_id
     campaign.flagged = 'Yes'
     db.session.commit()
+    create_notification(user,f"Your Campaign by the name of '{campaign.name}' has been flagged.")
     return redirect(url_for('home'))
 
 @app.route('/flagged_page',methods=['GET','POST'])
@@ -995,8 +1033,10 @@ def flagged_page():
 @app.route('/send_flag_message', methods=['POST'])
 def send_flag_message():
     user_id = request.form.get('user_id')
+    admin = User.query.filter_by(role='admin').first().id
     user = User.query.filter_by(id=user_id).first()
     user.flagged_messages = request.form.get('flagged_message')
+    create_notification(admin,f"New response from Flagged User {str(user.first_name) + ' ' + str(user.last_name)}:  {request.form.get('flagged_message')}")
     db.session.commit()
     return redirect(url_for('home'))
 
@@ -1011,8 +1051,10 @@ def unflag_user(user_id):
 @app.route('/send_campaign_flag_message', methods=['POST'])
 def send_campaign_flag_message():
     campaign_id = request.form.get('campaign_id')
+    admin=User.query.filter_by(role='admin').first().id
     campaign = Campaign.query.filter_by(id=campaign_id).first()
     campaign.flagged_messages = request.form.get('flagged_campaign_message')
+    create_notification(admin,f"New response for the Flagged Campaign: {campaign.name} with message: {request.form['flagged_campaign_message']}")
     db.session.commit()
     return redirect(url_for('home'))
 
@@ -1021,8 +1063,425 @@ def unflag_campaign(campaign_id):
     campaign = Campaign.query.filter_by(id=campaign_id).first()
     campaign.flagged = 'No'
     campaign.flagged_messages=None
+    user = Sponsor.query.filter_by(id=campaign.sponsor_id).first().user_id
+    create_notification(user,f"Your Campaign with name: {campaign.name} has been unflagged.")
     db.session.commit()
     return redirect(url_for('flagged_page'))
+
+@app.route('/view_payments',methods=['GET'])
+def view_payments():
+    role = session.get('role', 'guest')
+    username = session.get('user', 'Guest')
+    user_id = session.get('id')
+    payments_list=[]
+    if role == 'sponsor':
+        sponsor_id = Sponsor.query.filter_by(user_id=user_id).first().id
+        payments = Payment.query.filter_by(sponsor_id=sponsor_id).all()
+        payments_list = [
+        {
+            'id': payment.id,
+            'sponsor_id': payment.sponsor_id,
+            'influencer_name': db.session.query(User.first_name, User.last_name) \
+                .join(Influencer) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[0] + ' '+ db.session.query(User.first_name, User.last_name) \
+                .join(Influencer) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[1],
+            'influencer_id': payment.influencer_id,
+            'adrequest_id': payment.adrequest_id,
+            'amount': payment.payment_amount,
+            'payment_date': payment.payment_date.strftime('%Y-%m-%d')
+        }
+        for payment in payments
+        ]
+    elif role == 'influencer':
+        influencer_id = Influencer.query.filter_by(user_id=user_id).first().id
+        payments = Payment.query.filter_by(influencer_id=influencer_id).all()
+        payments_list = [
+            {
+                'id':payment.id,
+                'sponsor_id':payment.sponsor_id,
+                'sponsor_name':db.session.query(User.first_name, User.last_name) \
+                .join(Sponsor) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[0] + ' '+ db.session.query(User.first_name, User.last_name) \
+                .join(Sponsor) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[1],
+                'influencer_id':payment.influencer_id,
+                'adrequest_id':payment.adrequest_id,
+                'amount': payment.payment_amount,
+                'payment_date': payment.payment_date.strftime('%Y-%m-%d')
+            }
+            for payment in payments
+        ]
+    elif role == 'admin':
+        payments = Payment.query.all()
+        payments_list = [
+            {
+                'id':payment.id,
+                'sponsor_id':payment.sponsor_id,
+                'sponsor_name':db.session.query(User.first_name, User.last_name) \
+                .join(Sponsor) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[0] + ' '+ db.session.query(User.first_name, User.last_name) \
+                .join(Sponsor) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[1],
+                'influencer_id':payment.influencer_id,
+                'influencer_name':db.session.query(User.first_name, User.last_name) \
+                .join(Influencer) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[0] + ' '+ db.session.query(User.first_name, User.last_name) \
+                .join(Influencer) \
+                .join(Payment) \
+                .filter(Payment.id == payment.id) \
+                .first()[1],
+                'adrequest_id':payment.adrequest_id,
+                'amount': payment.payment_amount,
+                'payment_date': payment.payment_date.strftime('%Y-%m-%d')
+            }
+            for payment in payments
+        ]
+    return render_template('view_payments.html', payments=payments_list, role=role, username=username)
+
+@app.route('/view_invoice/<uuid:payment_id>',methods=['GET', 'POST'])
+def view_invoice(payment_id):
+    invoice = Invoice.query.filter_by(payment_id=payment_id).first()
+    expenses = AdRequest.query.filter_by(id=invoice.adrequest_id).first().requirements
+    influencer_fname = db.session.query(User.first_name).join(Influencer).filter(Influencer.user_id == User.id).filter(Influencer.id == invoice.influencer_id).first()
+    influencer_lname = db.session.query(User.last_name).join(Influencer).filter(Influencer.user_id == User.id).filter(Influencer.id == invoice.influencer_id).first()
+    sponsor_fname = db.session.query(User.first_name).join(Sponsor).filter(Sponsor.user_id == User.id).filter(Sponsor.id == invoice.sponsor_id).first()
+    sponsor_lname = db.session.query(User.last_name).join(Sponsor).filter(Sponsor.user_id == User.id).filter(Sponsor.id == invoice.sponsor_id).first()
+    invoice_list={
+                'id':invoice.id,
+                'payment_id':invoice.payment_id,
+                'influencer_id':invoice.influencer_id,
+                'influencer_name':str(influencer_fname[0])+ ' ' + str(influencer_lname[0]),
+                'sponsor_name':str(sponsor_fname[0])+ ' ' + str(sponsor_lname[0]),
+                'adrequest_id':invoice.adrequest_id,
+                'expenses':expenses,
+                'sponsor_id':invoice.sponsor_id,
+                'invoice_date':invoice.invoice_date,
+                'invoice_amount':invoice.invoice_amount
+            }
+    return render_template('view_invoice.html', invoice=invoice_list)
+
+@app.route('/give_feedback', methods=['GET', 'POST'])
+def give_feedback():
+    user_id = session.get('id')
+    role=session.get('role')
+
+    if role != 'admin':
+        feedbacks = Feedback.query.filter_by(user_id=user_id)
+        feedbacks_list = [
+            {
+                'id': feedback.id,
+                'user_id': feedback.user_id,
+                'comment': feedback.comment,
+                'rating': feedback.rating,
+                'feedback_date': feedback.feedback_date.strftime('%Y-%m-%d')
+            }
+            for feedback in feedbacks
+        ]
+        return render_template('feedback_page.html', feedbacks=feedbacks_list)
+    feedbacks = Feedback.query.all()
+    feedbacks_list = [
+            {
+                'id': feedback.id,
+                'user_id': feedback.user_id,
+                'name':db.session.query(User.first_name, User.last_name).filter(User.id == feedback.user_id).first()[0] + ' ' +
+                db.session.query(User.first_name, User.last_name).filter(User.id == feedback.user_id).first()[1],
+                'role':db.session.query(User.role).filter(User.id == feedback.user_id).first()[0],
+                'comment': feedback.comment,
+                'rating': feedback.rating,
+                'feedback_date': feedback.feedback_date.strftime('%Y-%m-%d')
+            }
+            for feedback in feedbacks
+        ]
+    return render_template('feedback_page.html', feedbacks=feedbacks_list, role=role)
+
+
+@app.route('/submit_feedback', methods=['POST'])
+def submit_feedback():
+    if request.method == 'POST':
+        user_id = session.get('id')
+        name = str(db.session.query(User.first_name, User.last_name).filter_by(id=user_id).first()[0]) + ' ' +str(db.session.query(User.first_name, User.last_name).filter_by(id=user_id).first()[1])
+        admin = User.query.filter_by(role='admin').first().id
+        rating = request.form['rating']
+        comment = request.form['comment']
+        feedback_date = datetime.today().date()
+        feedback = Feedback(user_id=user_id, rating=rating, comment=comment, feedback_date=feedback_date)
+        try:
+            db.session.add(feedback)
+            create_notification(admin,f"New Feedback raised by {name} with rating: {rating} and comment: {comment}")
+            db.session.commit()
+        except:
+            return 'Error adding feedback'
+    return redirect(url_for('give_feedback'))
+
+@app.route('/view_disputes', methods=['GET'])
+def view_disputes():
+    role=session.get('role')
+    user_id = session.get('id')
+    if role != 'admin':
+        disputes = Dispute.query.filter_by(user_id=user_id).all()
+        dispute_list=[
+            {
+                'id': dispute.id,
+                'user_id': dispute.user_id,
+                'payment_id': dispute.payment_id,
+                'reason': dispute.reason,
+                'description': dispute.description,
+                'status': dispute.status,
+                'dispute_date': dispute.dispute_date.strftime('%Y-%m-%d')
+            }
+            for dispute in disputes
+        ]
+        return render_template('view_disputes.html',disputes=dispute_list,role=role)
+    disputes = Dispute.query.all()
+    dispute_list=[
+            {
+                'id': dispute.id,
+                'user_id': dispute.user_id,
+                'name':db.session.query(User.first_name, User.last_name).filter(User.id == dispute.user_id).first()[0] +' ' +
+                db.session.query(User.first_name, User.last_name).filter(User.id == dispute.user_id).first()[1],
+                'role':db.session.query(User.role).filter(User.id == dispute.user_id).first()[0],
+                'payment_id': dispute.payment_id,
+                'reason': dispute.reason,
+                'description': dispute.description,
+                'status': dispute.status,
+                'dispute_date': dispute.dispute_date.strftime('%Y-%m-%d')
+            }
+            for dispute in disputes
+    ]
+    return render_template('view_disputes.html',disputes=dispute_list,role=role)
+
+@app.route('/submit_dispute',methods=['POST'])
+def submit_dispute():
+    if request.method == 'POST':
+        user_id = session.get('id')
+        admin = User.query.filter_by(role='admin').first().id
+        payment_id = request.form['payment_id']
+        reason = request.form['reason']
+        description = request.form['description']
+        status = "Under Review"
+        dispute = Dispute(user_id=user_id, payment_id=uuid.UUID(payment_id), reason=reason, description=description, status=status,dispute_date=datetime.today().date())
+        try:
+            create_notification(admin,f"New Dispute raised by a user with Payment ID: {payment_id}")
+            db.session.add(dispute)
+            db.session.commit()
+        except:
+            return 'Error adding dispute'
+    return redirect(url_for('view_disputes'))
+
+@app.route('/resolve_dispute/<int:dispute_id>',methods=['GET','POST'])
+def resolve_dispute(dispute_id):
+    dispute = Dispute.query.filter_by(id=dispute_id).first()
+    status = f'Resolved at: {str(datetime.today().date())}'
+    dispute.status = status
+    try:
+        create_notification(dispute.user_id, f"Dispute with Payment ID: {dispute.payment_id} has been resolved.")
+        db.session.commit()
+    except:
+        return 'Error resolving dispute'
+    return redirect(url_for('view_disputes'))
+
+@app.route('/view_messages', methods=['GET'])
+def view_messages():
+    role = session.get('role')
+    user_id = session.get('id')  
+    
+    if role == 'sponsor':
+        sponsor = Sponsor.query.filter_by(user_id=user_id).first()
+        adrequests = AdRequest.query.filter_by(sponsor_id=sponsor.id).all()
+        influencers = []
+        iset = set()
+        
+        for adrequest in adrequests:
+            influencer = Influencer.query.filter_by(id=adrequest.influencer_id).first()
+            if influencer.user_id not in iset:
+                iset.add(influencer.user_id)
+                user = User.query.filter_by(id=influencer.user_id).first()
+                influencers.append({'id': influencer.user_id, 'influencer_name': f"{user.first_name} {user.last_name}"})
+        
+        chat_with_name = None
+        messages, messages_list = [],[]
+        
+        if influencers:
+            influencer_user_id = request.args.get('receiver_id', influencers[0]['id'])
+            chat_with_influencer = next((inf for inf in influencers if inf['id'] == int(influencer_user_id)), influencers[0])
+            chat_with_name = chat_with_influencer['influencer_name']
+            
+            messages = Message.query.filter(
+                ((Message.sender_id == user_id) & (Message.receiver_id == influencer_user_id)) |
+                ((Message.sender_id == influencer_user_id) & (Message.receiver_id == user_id))
+            ).order_by(Message.message_date.asc()).all()
+
+            for message in messages:
+                sender = User.query.filter_by(id=message.sender_id).first()
+                sender_name = f"{sender.first_name} {sender.last_name}"
+                message_dict = {
+                    'sender_name': sender_name,
+                    'message_text': message.message_text,
+                    'timestamp': message.message_date.strftime("%Y-%m-%d %H:%M:%S")
+                }
+                messages_list.append(message_dict)
+
+        return render_template('view_messages.html', role=role, influencers=influencers, messages=messages_list, chat_with_name=chat_with_name, receiver_id=influencer_user_id)
+    
+    elif role == 'influencer':
+        influencer = Influencer.query.filter_by(user_id=user_id).first()
+        adrequests = AdRequest.query.filter_by(influencer_id=influencer.id).all()
+        sponsors = []
+        sset = set()
+        
+        for adrequest in adrequests:
+            sponsor = Sponsor.query.filter_by(id=adrequest.sponsor_id).first()
+            if sponsor.user_id not in sset:
+                sset.add(sponsor.user_id)
+                user = User.query.filter_by(id=sponsor.user_id).first()
+                sponsors.append({'id': sponsor.user_id, 'sponsor_name': f"{user.first_name} {user.last_name}"})
+        
+        chat_with_name = None
+        messages, messages_list = [],[]
+        
+        if sponsors:
+            sponsor_user_id = request.args.get('receiver_id', sponsors[0]['id'])
+            chat_with_sponsor = next((sp for sp in sponsors if sp['id'] == int(sponsor_user_id)), sponsors[0])
+            chat_with_name = chat_with_sponsor['sponsor_name']
+            
+            messages = Message.query.filter(
+                ((Message.sender_id == user_id) & (Message.receiver_id == sponsor_user_id)) |
+                ((Message.sender_id == sponsor_user_id) & (Message.receiver_id == user_id))
+            ).order_by(Message.message_date.asc()).all()
+
+            for message in messages:
+                sender = User.query.filter_by(id=message.sender_id).first()
+                sender_name = f"{sender.first_name} {sender.last_name}"
+                message_dict = {
+                    'sender_name': sender_name,
+                    'message_text': message.message_text,
+                    'timestamp': message.message_date.strftime("%Y-%m-%d %H:%M:%S")
+                }
+                messages_list.append(message_dict)
+
+        return render_template('view_messages.html', role=role, sponsors=sponsors, messages=messages_list, chat_with_name=chat_with_name, receiver_id=sponsor_user_id)
+    
+    return jsonify(success=False, error="Invalid role")
+
+
+
+
+@app.route('/send_message', methods=['POST'])
+def send_message():
+    sender_id = session.get('id')
+    admin = User.query.filter_by(role='admin').first().id
+    sender_name = str(db.session.query(User.first_name, User.last_name).filter_by(id=sender_id).first()[0]) + ' ' +str(db.session.query(User.first_name, User.last_name).filter_by(id=sender_id).first()[1])
+    receiver_id = request.form.get('receiver_id')
+    receiver_name =  str(db.session.query(User.first_name, User.last_name).filter_by(id=receiver_id).first()[0]) + ' ' +str(db.session.query(User.first_name, User.last_name).filter_by(id=receiver_id).first()[1])
+    message_text = request.form.get('message_text')
+
+    if receiver_id and message_text:
+        try:
+            new_message = Message(
+                sender_id=sender_id,
+                receiver_id=receiver_id,
+                message_text=message_text,
+                message_date=datetime.now()
+            )
+            create_notification(receiver_id, f"Message received from {sender_name}: {message_text}")
+            create_notification(admin, f"Message sent from {sender_name} to {receiver_name} with text: {message_text}")
+            db.session.add(new_message)
+            db.session.commit()
+            return redirect(url_for('view_messages', receiver_id=receiver_id))
+        except Exception as e:
+            return f"Error sending message: {str(e)}", 500
+    else:
+        return "Missing receiver ID or message text", 400
+
+@app.route('/view_notifications',methods=['GET'])
+def view_notifications():
+    user_id = session.get('id')
+    notifications=Notification.query.filter_by(user_id=user_id).all()
+    notifications_list=[
+        {
+            'id':notification.id,
+            'notification_text':notification.notification_text,
+            'notification_date':notification.notification_date.strftime("%Y-%m-%d %H:%M")
+        }
+        for notification in notifications
+    ]
+
+    return render_template('view_notifications.html', notifications=notifications_list)
+
+def create_notification(user_id, text):
+    today=datetime.now()
+    new_notification = Notification(
+        user_id=user_id,
+        notification_text=text,
+        notification_date=today
+    )
+    db.session.add(new_notification)
+    db.session.commit()
+
+@app.route('/view_faqs',methods=['GET'])
+def view_faqs():
+    role=session.get('role')
+    all_faqs=FAQ.query.all()
+    all_faqlist=[
+        {
+            'id':faq.id,
+            'question':faq.question,
+            'user_name':str(db.session.query(User.first_name, User.last_name).filter(User.id == faq.user_id).first()[0]) + ' '+
+            str(db.session.query(User.first_name, User.last_name).filter(User.id == faq.user_id).first()[1]) + ' (' + str(db.session.query(User.username).filter(User.id == faq.user_id).first()[0]) + ')',
+            'answer':faq.answer if faq.answer else None,
+            'created_at':faq.created_at.strftime("%Y-%m-%d %H:%M"),
+            'updated_at':faq.updated_at.strftime("%Y-%m-%d %H:%M") if faq.updated_at else None
+        }
+        for faq in all_faqs
+    ]
+    
+    return render_template('view_faqs.html',role=role,faqs=all_faqlist)
+
+@app.route('/submit_faq',methods=['POST'])
+def submit_faq():
+    if request.method == 'POST':
+        user_id = session.get('id')
+        name = str(db.session.query(User.first_name, User.last_name).filter_by(id=user_id).first()[0]) + ' ' +str(db.session.query(User.first_name, User.last_name).filter_by(id=user_id).first()[1])
+        admin = User.query.filter_by(role='admin').first().id
+        question=request.form['question']
+        today = datetime.now()
+        new_faq=FAQ(user_id=user_id,question=question,answer=None,created_at=today,updated_at=None)
+        try:
+            create_notification(admin, f"New FAQ posted by {name} with question: {question}")
+            db.session.add(new_faq)
+            db.session.commit()
+            return redirect(url_for('view_faqs'))
+        except:
+            return 'Error in Raising Query'
+
+@app.route('/answer_faq/<int:faq_id>', methods=['GET', 'POST'])
+def answer_faq(faq_id):
+    faq = FAQ.query.filter_by(id=faq_id).first()
+
+    if request.method == 'POST':
+        answer = request.form['answer']
+        faq.answer = answer
+        faq.updated_at = datetime.today()
+        create_notification(faq.user_id, f"Your FAQ was answered. The answer is: {answer}")
+        db.session.commit()
+        return redirect(url_for('view_faqs'))
+
+    return render_template('answer_faq.html', faq=faq)
 
 if __name__ == "__main__":
     with app.app_context():

@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Home</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
     <script src="https://code.jquery.com/jquery-3.2.1.slim.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.11.0/umd/popper.min.js"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"></script>
@@ -24,36 +25,6 @@
         .dropdown-menu-left {
             left: auto!important;
             right: 0!important;
-        }
-
-
-        .roundedTable {
-            border-collapse: separate;
-            border-spacing: 10px 10px; 
-            width: 100%;
-            margin: 0;
-        }
-
-        .roundedTable th,
-        .roundedTable td {
-            padding: .6em;
-            background: #659dffaf;
-            border: none;
-            border-radius: .6em;
-            box-shadow: 0 0 5px rgba(0,0,0,0.1);
-            text-align: center;
-        }
-
-        .roundedTable th {
-            text-align: center;
-        }
-
-        .roundedTable tr td + td {
-            margin-left: 10px; 
-        }
-
-        .roundedTable {
-            border: none;
         }
         .center {
             display: block;
@@ -111,54 +82,6 @@
             document.getElementById('flaggedcampaignId').value = campaignId;
             $('#flaggedCampaignMessageModal').modal('show');
         }   
-
-
-        function showAdRequestTable() {
-            document.getElementById("adRequestTableView").style.display = "block";
-            document.getElementById("adRequestCardView").style.display = "none";
-        }
-
-        function showAdRequestCard(){
-            document.getElementById("adRequestTableView").style.display = "none";
-            document.getElementById("adRequestCardView").style.display = "block";
-        }
-
-        function showCampaignTable(){
-            document.getElementById("campaignTableView").style.display = "block";
-            document.getElementById("campaignCardView").style.display = "none";
-        } 
-        
-        function showInactiveCampaignTable(){
-            document.getElementById("inactivecampaignTableView").style.display = "block";
-            document.getElementById("inactivecampaignCardView").style.display = "none";
-        }
-        function showInactiveCampaignCard(){
-            document.getElementById("inactivecampaignTableView").style.display = "none";
-            document.getElementById("inactivecampaignCardView").style.display = "block";
-        }
-
-        function showSponsorTable(){
-            document.getElementById("sponsorTableView").style.display = "block";
-            document.getElementById("sponsorCardView").style.display = "none";
-        }  
-        function showSponsorCard(){
-            document.getElementById("sponsorTableView").style.display = "none";
-            document.getElementById("sponsorCardView").style.display = "block";
-        }  
-
-        function showInfluencerTable(){
-            document.getElementById("influencerTableView").style.display = "block";
-            document.getElementById("influencerCardView").style.display = "none";
-        }
-        function showInfluencerCard(){
-            document.getElementById("influencerTableView").style.display = "none";
-            document.getElementById("influencerCardView").style.display = "block";
-        }
-
-        function showCampaignCard(){
-            document.getElementById("campaignTableView").style.display = "none";
-            document.getElementById("campaignCardView").style.display = "block";
-        }
     </script>    
 </head>
 <body>
@@ -175,66 +98,169 @@
                 {% if role == 'sponsor' %}
                     {% if flagged != 'Yes' %}
                     <li class="nav-item">
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('create_campaign') }}">Create Campaign</a>
+                        <a class="btn btn-secondary" title="Create a Campaign" href="{{ url_for('create_campaign') }}"><i class="fa fa-plus"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search_influencers') }}">Search for Influencers</a>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('sponsor_stats') }}">Statistics</a>
+                        <a class="btn btn-success" title="Search for Influencers" href="{{ url_for('search_influencers') }}"><i class="fa fa-search"></i></a>
                     </li>
                     <li class="nav-item">
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        </p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     </li>
                     <li class="nav-item">
-                        <button class="btn btn-primary" onclick="showAdRequestTable(); showCampaignTable();">Table View</button>
-                        <button class="btn btn-info" onclick="showAdRequestCard(); showCampaignCard();">Card View</button>
+                        <a class="btn btn-primary" title="Stats" href="{{ url_for('sponsor_stats') }}"><i class="fa fa-bar-chart-o"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-warning" title="View Payments/Invoices" href="{{ url_for('view_payments') }}"><i class="fa fa-credit-card"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" title="Raise a Dispute" href="{{url_for('view_disputes')}}"><i class="fa fa-warning"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-info" title="Submit Feedback" href="{{ url_for('give_feedback') }}"><i class="fa fa-check"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-success" title="FAQs" href="{{ url_for('view_faqs') }}"><i class="fa fa-question" style="font-size:20px"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-light" title="Messages" href="{{url_for('view_messages')}}"><i class="fa fa-comments-o"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" title="Notifications" href="{{url_for('view_notifications')}}"><i class="fa fa-bell"></i></a>
                     </li>
                     {% endif %}
                 {% elif role == 'influencer' %}
                     {% if flagged != 'Yes' %}
                     <li class="nav-item">
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('search_campaigns') }}">Search for Campaigns</a>
+                        <a class="btn btn-success" title="Search for Campaigns" href="{{ url_for('search_campaigns') }}"><i class="fa fa-search"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('influencer_stats') }}">Statistics</a>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     </li>
                     <li class="nav-item">
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a class="btn btn-primary" title="Stats" href="{{ url_for('influencer_stats') }}"><i class="fa fa-bar-chart-o"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-warning" title="Payments" href="{{ url_for('view_payments') }}"><i class="fa fa-credit-card"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" title="Raise a Dispute" href="{{url_for('view_disputes')}}"><i class="fa fa-warning"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                             &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </p>
                     </li>
                     <li class="nav-item">
-                        <button class="btn btn-primary" onclick="showAdRequestTable(); showCampaignTable();">Table View</button>
-                        <button class="btn btn-info" onclick="showAdRequestCard(); showCampaignCard();">Card View</button>
+                        <a class="btn btn-info" title="Submit Feedback" href="{{ url_for('give_feedback') }}"><i class="fa fa-check"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-success" title="FAQs" href="{{ url_for('view_faqs') }}"><i class="fa fa-question" style="font-size:20px"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-light" title="Messages" href="{{ url_for('view_messages') }}"><i class="fa fa-comments-o"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" title="Notifications" href="{{url_for('view_notifications')}}"><i class="fa fa-bell"></i></a>
                     </li>
                     {% endif %}
                 {% elif role == 'admin' %}
                     <li class="nav-item">
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('all_stats') }}">Statistics</a>
+                        <a class="btn btn-primary"  title="Stats" href="{{ url_for('all_stats') }}"><i class="fa fa-bar-chart-o"></i></a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="{{ url_for('flagged_page') }}">Flagged Users/Campaigns</a>
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
                     </li>
                     <li class="nav-item">
-                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                        <a class="btn btn-danger" title="Flagged Users/Campaigns" href="{{ url_for('flagged_page') }}"><i class="fa fa-flag"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-warning" title="Payments" href="{{ url_for('view_payments') }}"><i class="fa fa-credit-card"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-info" title="User Feedback" href="{{ url_for('give_feedback') }}"><i class="fa fa-check"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" title="Disputes" href="{{url_for('view_disputes')}}"><i class="fa fa-warning"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+                            &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
                         </p>
                     </li>
                     <li class="nav-item">
-                        <button class="btn btn-primary" onclick="showCampaignTable(); showSponsorTable(); showInfluencerTable(); showAdRequestTable(); showInactiveCampaignTable();">Table View</button>
-                        <button class="btn btn-info" onclick="showCampaignCard(); showSponsorCard(); showInfluencerCard(); showAdRequestCard(); showInactiveCampaignCard();">Card View</button>
+                        <a class="btn btn-success" title="FAQs" href="{{ url_for('view_faqs') }}"><i class="fa fa-question" style="font-size:20px"></i></a>
+                    </li>
+                    <li class="nav-item">
+                        <p>&nbsp;&nbsp;&nbsp;</p>
+                    </li>
+                    <li class="nav-item">
+                        <a class="btn btn-danger" title="Notifications" href="{{url_for('view_notifications')}}"><i class="fa fa-bell"></i></a>
                     </li>
                 {% endif %}
             </ul>
@@ -273,43 +299,6 @@
             <h2 class="mt-4">Hello there, Admin {{uname}}!</h2>
             <br>
             <h3>All Sponsors (Unflagged):</h3>
-            <div id="sponsorTableView">
-                <table class="table table-sm table-bordered roundedTable">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Username</th>
-                            <th>Sponsor Name</th>
-                            <th>Email</th>
-                            <th>Phone Number</th> 
-                            <th>Company Name</th> 
-                            <th>Industry</th>
-                            <th>Budget</th>
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for element in sponsorlist %}
-                            {% if element['flagged'] == 'No' %}
-                            <tr>
-                                <td>{{loop.index}}</td>
-                                <td>{{element['username']}}</td>
-                                <td>{{element['first_name']}} {{element['last_name']}}</td>
-                                <td>{{element['email']}}</td>
-                                <td>{{element['phone_number']}}</td>
-                                <td>{{element['company_name']}}</td>
-                                <td>{{element['industry']}}</td>
-                                <td>{{element['budget']}}</td>
-                                <td>
-                                    <a href="{{url_for('flag_user', user_id=element['id'])}}" class="btn btn-danger">Flag</a>
-                                </td>
-                            </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div id="sponsorCardView" style="display: none;">
                 <div class="row">
                 {% for element in sponsorlist %}
                     {% if element['flagged'] == 'No' %}
@@ -322,51 +311,13 @@
                                 <p class="card-text">Company Name: {{element['company_name']}}</p>
                                 <p class="card-text">Industry: {{element['industry']}}</p>
                                 <p class="card-text">Budget: {{element['budget']}}</p>
-                                <a href="{{url_for('flag_user', user_id=element['id'])}}" class="btn btn-danger">Flag</a>
+                                <a href="{{url_for('flag_user', user_id=element['id'])}}" class="btn btn-danger"><i class="fa fa-flag"></i></a>
                             </div>
                         </div>
                     {% endif %}
                 {% endfor %}
-            </div>
             </div> <br>
             <h3>All Influencers (Unflagged):</h3>
-            <div id="influencerTableView">
-                <table class="table table-sm table-bordered roundedTable">
-                    <thead>
-                        <tr>
-                            <th>No</th>
-                            <th>Username</th>
-                            <th>Influencer Name</th>
-                            <th>Email</th>
-                            <th>Phone Number</th>
-                            <th>Niche</th>
-                            <th>Category</th>
-                            <th>Reach</th>  
-                            <th>Action</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for influencer in influencerlist %}
-                            {% if influencer['flagged'] == 'No' %}
-                            <tr>
-                                <td>{{loop.index}}</td>
-                                <td>{{influencer['username']}}</td>
-                                <td>{{influencer['first_name']}} {{influencer['last_name']}}</td>
-                                <td>{{influencer['email']}}</td>
-                                <td>{{influencer['phone_number']}}</td>
-                                <td>{{influencer['niche']}}</td>
-                                <td>{{influencer['category']}}</td>
-                                <td>{{influencer['reach']}}</td>
-                                <td>
-                                    <a href="{{url_for('flag_user', user_id=influencer['id'])}}" class="btn btn-danger">Flag</a>
-                                </td>
-                            </tr>
-                            {% endif %}
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <div id="influencerCardView" style="display: none;">
                 <div class="row">
                 {% for element in influencerlist %}
                     {% if element['flagged'] == 'No' %}
@@ -379,59 +330,13 @@
                                 <p class="card-text">Niche: {{element['niche']}}</p>
                                 <p class="card-text">Category: {{element['category']}}</p>
                                 <p class="card-text">Reach: {{element['reach']}}</p>
-                                <a href="{{url_for('flag_user', user_id=element['id'])}}" class="btn btn-danger">Flag</a>
+                                <a href="{{url_for('flag_user', user_id=element['id'])}}" class="btn btn-danger"><i class="fa fa-flag"></i></a>
                             </div>
                         </div>
                     {% endif %}
                 {% endfor %}
-            </div>
             </div> <br>
-            <div id="campaignTableView">
-                <h3>All Active Campaigns (Unflagged):</h3>
-                {% if active_campaigns|length > 0 %} 
-                    <table class="table table-sm table-bordered roundedTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Sponsor Name</th>
-                                <th>Campaign Name</th>
-                                <th>Description</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Budget</th>
-                                <th>Visibility</th>
-                                <th>Goals</th>
-                                <th>Action</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for element in active_campaigns %}
-                                {% if element['flagged'] == 'No' %}
-                                <tr>
-                                        <td>{{ loop.index }}</td>
-                                        <td>{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}</td>
-                                        <td>{{ element['name'] }}</td>
-                                        <td>{{ element['description'] }}</td>
-                                        <td>{{ element['start_date'] }}</td>
-                                        <td>{{ element['end_date'] }}</td>
-                                        <td>{{ element['budget'] }}0</td>
-                                        <td>{{ element['visibility'] }}</td>
-                                        <td>{{ element['goals'] }}</td>
-                                        <td>
-                                            <a href="{{url_for('flag_campaign', campaign_id=element['id'])}}" class="btn btn-danger">Flag</a>
-                                        </td>
-                                    
-                                </tr>
-                                {% endif %}
-                            {% endfor %}
-                        {% else %}
-                            <h3>No Campaigns have been created...</h3>
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
             {% if active_campaigns|length > 0 %}
-                <div id="campaignCardView" style="display: none;">
                     <h3>All Active Campaigns:</h3>
                     <div class="row">
                     {% for element in active_campaigns %}
@@ -446,52 +351,15 @@
                                         <p class="card-text">Budget: {{element['budget']}}0</p>
                                         <p class="card-text">Visibility: {{element['visibility']}}</p>
                                         <p class="card-text">Goals: {{element['goals']}}</p>
-                                        <a href="{{url_for('flag_campaign', campaign_id=element['id'])}}" class="btn btn-danger">Flag</a>
+                                        <a href="{{url_for('flag_campaign', campaign_id=element['id'])}}" class="btn btn-danger"><i class="fa fa-flag"></i></a>
                                 </div>
                             </div>
                         {% endif %}
                     {% endfor %}
                 </div>
-                </div>
             {% endif %}
             <br>
-            <div id="inactivecampaignTableView">
-                {% if inactive_campaigns|length > 0 %}
-                    <h3>All Completed/Inactive Campaigns:</h3>
-                    <table class="table table-sm table-bordered roundedTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Sponsor Name</th>
-                                <th>Campaign Name</th>
-                                <th>Description</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Budget</th>
-                                <th>Visibility</th>
-                                <th>Goals</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for element in inactive_campaigns %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}</td>
-                                    <td>{{ element['name'] }}</td>
-                                    <td>{{ element['description'] }}</td>
-                                    <td>{{ element['start_date'] }}</td>
-                                    <td>{{ element['end_date'] }}</td>
-                                    <td>{{ element['budget'] }}0</td>
-                                    <td>{{ element['visibility'] }}</td>
-                                    <td>{{ element['goals'] }}</td>
-                                </tr>
-                            {% endfor %}
-                        {% endif %}
-                    </tbody>
-                </table>
-            </div>
             {% if inactive_campaigns|length > 0 %}
-                <div id="inactivecampaignCardView" style="display: none;">
                     <h3>All Completed/Inactive Campaigns:</h3>
                     <div class="row">
                     {% for element in inactive_campaigns %}
@@ -508,44 +376,8 @@
                             </div>
                     {% endfor %}
                 </div>
-                </div>
             {% endif %}
             <br><h3>All Ad Requests:</h3>
-            <div id="adRequestTableView">
-                {% if adrequestlist|length > 0 %}
-                    <table class="table table-sm table-bordered roundedTable">
-                       <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Influencer Name</th>
-                                <th>Sponsor Name</th>
-                                <th>Campaign Name</th>
-                                <th>Messages</th>
-                                <th>Requirements</th>
-                                <th>Payment Amount</th>
-                                <th>Status</th>
-                            </tr>
-                       </thead>
-                       <tbody>
-                            {% for element in adrequestlist %}
-                                <tr>
-                                    <td>{{loop.index}}</td>
-                                    <td>{{element['influencer_first_name']}} {{element['influencer_last_name']}}</td>
-                                    <td>{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}</td>
-                                    <td>{{element['campaign_name']}}</td>
-                                    <td>{{element['messages']}}</td>
-                                    <td>{{element['requirements']}}</td>
-                                    <td>{{element['payment_amount']}}</td>
-                                    <td>{{element['status']}}</td>
-                                </tr>
-                            {% endfor %}
-                       </tbody>
-                    </table>
-                {% else %}
-                    <h3>No Ad Requests have been sent between Sponsors and Influencers...</h3>
-                {% endif %}
-            </div>
-            <div id="adRequestCardView" style="display: none;">
                 {% if adrequestlist|length > 0 %}
                     <div class="row">
                         {% for element in adrequestlist %}
@@ -563,7 +395,6 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-            </div>
         {% elif role == 'sponsor' %}
             {% if flagged == 'Yes' %}
                 {% if flagged_messages %}
@@ -578,60 +409,6 @@
             <h2 class="mt-4">{{ uname }}'s Dashboard</h2>
             <h3 class="mt-4">Your Campaigns:</h3>
             {% if campaigns|length > 0 %}
-                <div id="campaignTableView">
-                    <table class="table table-sm table-bordered roundedTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Campaign Name</th>
-                                <th>Description</th>
-                                <th>Start Date</th>
-                                <th>End Date</th>
-                                <th>Budget</th>
-                                <th>Visibility</th>
-                                <th>Goals</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for element in campaigns %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ element['name'] }}</td>
-                                    <td>{{ element['description'] }}</td>
-                                    <td>{{ element['start_date'] }}</td>
-                                    <td>{{ element['end_date'] }}</td>
-                                    <td>{{ element['budget'] }}0</td>
-                                    <td>{{ element['visibility'] }}</td>
-                                    <td>{{ element['goals'] }}</td>
-                                    <td>
-                                        {% if element['end_date'] < today_date %}
-                                            <h7><strong>This is a Completed/Inactive Campaign</strong></h7>
-                                        {% else %}
-                                            {% if element['flagged'] == 'Yes' %}
-                                                {% if element['flagged_messages'] %}
-                                                    <h7><strong>This Campaign has been Flagged. Please Contact the Admin via Message.</strong></h7>
-                                                    <br>
-                                                    <button onclick="showFlaggedCampaignMessageModal('{{element['id']}}')" class="btn btn-primary text-white">Send Message</button>
-                                                {% else %}
-                                                    <h7><strong>Your message was sent. Waiting for action from the Admin...</strong></h7>
-                                                {% endif %}
-                                            {% else %}
-                                                <button onclick="showDeleteModal('{{ element['id'] }}', '{{ element['name'] }}')" class="btn btn-danger">Delete</button>
-                                                <a class="btn btn-primary" href="{{ url_for('edit_campaign', id=element['id']) }}">Edit</a>
-                                            {% endif %}
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <h3>You haven't created any Campaigns yet...</h3>
-            {% endif %}
-            {% if campaigns|length > 0 %}
-                <div id="campaignCardView" style="display: none;">
                     <div class="row">
                     {% for element in campaigns %}
                             <div class="card m-2 text-white bg-info mb-3">
@@ -645,78 +422,17 @@
                                     {% if element['flagged'] == 'Yes' %}
                                         <h5 class="card-info text-dark">This Campaign has been Flagged.</h5>
                                     {% else %}
-                                        <button class="btn btn-danger" onclick="showDeleteModal({{ element['id'] }}, '{{ element['name'] }}')">Delete</button>
-                                        <a class="btn btn-light" href="{{ url_for('edit_campaign', id=element['id']) }}">Edit</a>
+                                        <button class="btn btn-danger" onclick="showDeleteModal({{ element['id'] }}, '{{ element['name'] }}')"><i class="fa fa-trash-o"></i></button>
+                                        <a class="btn btn-light" href="{{ url_for('edit_campaign', id=element['id']) }}"><i class="fa fa-pencil"></i></a>
                                     {% endif %}
                                 </div>
                             </div>
                     {% endfor %}
                     </div>
-                </div>
             {% endif %}
             <br>
             <h3 class="mt-4">Your Ad Requests:</h3>
             {% if adrequests|length > 0 %}
-                <div id="adRequestTableView">
-                    <table class="table table-sm table-bordered roundedTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Influencer Name</th>
-                                <th>Campaign Name</th>
-                                <th>Messages</th>
-                                <th>Requirements</th>
-                                <th>Payment Amount</th>
-                                <th>Status</th>
-                                <th>Ready for Payment?</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for element in adrequests %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ element['influencer_first_name'] }} {{ element['influencer_last_name'] }}</td>
-                                    <td>{{ element['campaign_name'] }}</td>
-                                    <td>{{ element['messages'] }}</td>
-                                    <td>{{ element['requirements'] }}</td>
-                                    <td>{{ element['payment_amount'] }}0</td>
-                                    <td>{{ element['status'] }}</td>
-                                    <td>
-                                        {% if element['status'] == 'accepted' %}
-                                            <a href = " {{url_for('payment_page',adrequest_id = element['id'])}} " class="btn btn-primary">Proceed to Payment</a>
-                                        {% elif element['status'] == 'rejected' %}
-                                            <h7><strong>Payment Voided. Rejected Ad Request.</strong></h7>
-                                        {% elif element['status'] == 'Pending' %}
-                                                <h7><strong>Influencer is still deciding.....</strong></h7>
-                                        {% elif element['status'] == 'paid' %}
-                                            <h7><strong>Payment Completed!!</strong></h7>
-                                        {% elif element['status'] == 'negotiating' %}
-                                            <h7><strong>{{ element['influencer_first_name'] }} {{element['influencer_last_name']}} wants to change the Payment Amount to: {{element['new_payment_amount']}}0</strong></h7>
-                                        {% endif %}
-                                    </td>
-                                    <td>
-                                        {% if element['status'] == 'accepted' %}
-                                            <h7><strong>You can't edit/delete an accepted Ad Request</strong></h7>
-                                        {% elif element['status'] == 'rejected' %}
-                                            <h7><strong>You can't edit/delete a rejected Ad Request</strong></h7>
-                                        {% elif element['status'] == 'paid' %}
-                                            <h7><strong>You can't edit/delete a accepted and paid Ad Request</strong></h7>
-                                        {% elif element['status'] == 'Pending' or element['status'] == 'negotiating' %}
-                                            <button onclick="showDeleteAdRequestModal('{{ element['id'] }}', '{{ element['campaign_name'] }}')" class="btn btn-danger">Delete</button>
-                                            <a class="btn btn-primary" href="{{ url_for('edit_adrequest', id=element['id']) }}">Edit</a>
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <h3>You haven't sent/received any Ad Requests yet....</h3>
-            {% endif %}
-            {% if adrequests|length > 0 %}
-                <div id="adRequestCardView" style="display: none;">
                     <div class="row">
                     {% for element in adrequests %}
                             <div class="card m-2 text-white bg-info mb-3">
@@ -732,19 +448,18 @@
                                     {% elif element['status'] == 'rejected' %}
                                         <h5 class="card-info text-dark">{{ element['influencer_first_name'] }} {{element['influencer_last_name']}} has rejected your Ad Request</h5>
                                     {% elif element['status'] == 'Pending' %}
-                                        <button onclick="showDeleteAdRequestModal('{{ element['id'] }}', '{{ element['campaign_name'] }}')" class="btn btn-danger">Delete</button>
-                                        <a class="btn btn-light" href="{{ url_for('edit_adrequest', id=element['id']) }}">Edit</a>
+                                        <button onclick="showDeleteAdRequestModal('{{ element['id'] }}', '{{ element['campaign_name'] }}')" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                        <a class="btn btn-light" href="{{ url_for('edit_adrequest', id=element['id']) }}"><i class="fa fa-pencil"></i></a>
                                     {% elif element['status'] == 'paid' %}
                                         <h5 class="card-info text-dark">Payment Completed!!</h5>
                                     {% elif element['status'] == 'negotiating' %}
                                         <h5 class="card-info text-dark">{{ element['influencer_first_name'] }} {{element['influencer_last_name']}} wants to change the Payment Amount to: {{element['new_payment_amount']}}</h5>
-                                        <button onclick="showDeleteAdRequestModal('{{ element['id'] }}', '{{ element['campaign_name'] }}')" class="btn btn-danger">Delete</button>
-                                        <a class="btn btn-light" href="{{ url_for('edit_adrequest', id=element['id']) }}">Edit</a>
+                                        <button onclick="showDeleteAdRequestModal('{{ element['id'] }}', '{{ element['campaign_name'] }}')" class="btn btn-danger"><i class="fa fa-trash-o"></i></button>
+                                        <a class="btn btn-light" href="{{ url_for('edit_adrequest', id=element['id']) }}"><i class="fa fa-pencil"></i></a>
                                     {% endif %}
                                 </div>
                             </div>
                     {% endfor %}
-                </div>
                 </div>
                 {% endif %}
             {% endif %}
@@ -763,55 +478,6 @@
             <h2 class="mt-4">{{uname}}'s Dashboard</h2>
             <h3 class="mt-4">Your Ad Requests:</h3>
             {% if adreceives|length > 0 %}
-                <div id="adRequestTableView">
-                    <table class="table table-sm table-bordered roundedTable">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Sponsor Name</th>
-                                <th>Campaign Name</th>
-                                <th>Messages</th>
-                                <th>Requirements</th>
-                                <th>Payment Amount</th>
-                                <th>Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for element in adreceives %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>{{ element['sponsor_first_name'] }} {{ element['sponsor_last_name'] }}</td>
-                                    <td>{{ element['campaign_name'] }}</td>
-                                    <td>{{ element['messages'] }}</td>
-                                    <td>{{ element['requirements'] }}</td>
-                                    <td>{{ element['payment_amount'] }}0</td>
-                                    <td>
-                                        {% if element['status'] == 'accepted' %}
-                                            <h7><strong>You have accepted this Ad Request! Payment Pending.</strong></h7>
-                                        {% elif element['status'] == 'rejected' %}
-                                            <h7><strong>You have rejected this Ad Request...</strong></h7>
-                                        {% elif element['status'] == 'paid' %}
-                                            <h7><strong>Payment Received!</strong></h7>
-                                        {% elif element['status'] == 'Pending' %}
-                                            <button class="btn btn-primary" onclick="showAcceptModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}')">Accept</button>
-                                            <button class="btn btn-danger" onclick="showRejectModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}' )">Reject</button>
-                                            <button class="btn btn-info" onclick="showNegotiateModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}' )">Negotiate</button>   
-                                        {% elif element['status'] == 'negotiating' %} 
-                                            <button class="btn btn-primary" onclick="showAcceptModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}')">Accept</button>
-                                            <button class="btn btn-danger" onclick="showRejectModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}' )">Reject</button>
-                                            <button class="btn btn-info" onclick="showNegotiateModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}' )">Negotiate</button>   
-                                        {% endif %}
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            {% else %}
-                <h3>You haven't sent/received any Ad Requests yet...</h3>
-            {% endif %}
-            {% if adreceives|length > 0 %}
-                <div id="adRequestCardView" style="display: none;">
                     <div class="row">
                     {% for element in adreceives %}
                             <div class="card m-2 text-white bg-info mb-3">
@@ -828,14 +494,13 @@
                                     {% elif element['status'] == 'paid' %}
                                         <p class="card-text text-dark"><strong>Payment Received!!</strong></p>
                                     {% elif element['status'] == 'Pending' or element['status'] == 'negotiating' %}
-                                        <button class="btn btn-success" onclick="showAcceptModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}')">Accept</button>
-                                        <button class="btn btn-danger" onclick="showRejectModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}' )">Reject</button>
+                                        <button class="btn btn-success" onclick="showAcceptModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}')"><i class="fa fa-check"></i></button>
+                                        <button class="btn btn-danger" onclick="showRejectModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}' )"><i class="fa fa-close"></i></button>
                                         <button class="btn btn-light" onclick="showNegotiateModal('{{ element['id'] }}', '{{element['sponsor_first_name']}} {{element['sponsor_last_name']}}' )">Negotiate</button>                                       
                                     {% endif %}
                                 </div>
                             </div>
                     {% endfor %}
-                </div>
                 </div>
                 {% endif %}
             {% endif %}
